@@ -123,8 +123,9 @@ const Modal: React.FC<{
               Price
             </label>
             <input
-              className="p-3 rounded-lg text-gray-700"
+              className="p-3 rounded-lg text-gray-700 bg-gray-300 cursor-not-allowed"
               type="text"
+              disabled
               placeholder="0"
               value={price + " $"}
               readOnly

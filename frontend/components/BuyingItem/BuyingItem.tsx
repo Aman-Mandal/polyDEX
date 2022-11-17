@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BigNumber, ethers } from "ethers";
 import Modal from "../Modal/Modal";
-import { useContext,useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { dexContext } from "../../components/Layout/Layout";
 const BuyingItem: React.FC<{
   name: string;
@@ -9,10 +9,11 @@ const BuyingItem: React.FC<{
   price: number;
   seller: string;
   id: number;
-  matic : boolean;
-}> = ({ name, quantity, price,seller,id ,matic}) => {
+  matic: boolean;
+}> = ({ name, quantity, price, seller, id, matic }) => {
   const [showModal, setShowModal] = useState<boolean>(false);
-  const { contract,signer ,account}: any = useContext(dexContext);
+  const { contract, signer, account }: any = useContext(dexContext);
+
 
   const buyItemHandler = () => {
     setShowModal(true);
@@ -26,14 +27,13 @@ const BuyingItem: React.FC<{
     return ethers.utils.formatEther(amount).toString();
   }
 
-  const buyItem = async (id:number,amount:BigNumber,name:string) => {
+  const buyItem = async (id: number, amount: BigNumber, name: string) => {
     try {
-      if(matic){
-        const tx = await contract.buyMaticRequest(id,amount,name);
+      if (matic) {
+        const tx = await contract.buyMaticRequest(id, amount, name);
         await tx.wait();
-      }
-      else{
-        const tx = await contract.buyTokenRequest(id,amount,name);
+      } else {
+        const tx = await contract.buyTokenRequest(id, amount, name);
         await tx.wait();
       }
       alert("Item bought successfully!");

@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 import BuyingItem from "../../components/BuyingItem/BuyingItem";
-import { useContext,useState } from "react";
+import { useContext, useState } from "react";
 import { dexContext } from "../../components/Layout/Layout";
 import { ethers } from "ethers";
 import { contract_address, contract_abi } from "../../constants/index";
+import Loader from "../../components/Loader/Loader";
 
 interface Data {
   tokenName: string;
@@ -15,12 +16,15 @@ interface Data {
 }
 
 const BuyingPage: React.FC = () => {
-  
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [data, setData] = useState<Data[]>([]);
 
   const getData = async () => {
-    try{
-      const provider = new ethers.providers.JsonRpcProvider("https://rpc-mumbai.maticvigil.com/");
+    try {
+      setIsLoading(true);
+      const provider = new ethers.providers.JsonRpcProvider(
+        "https://rpc-mumbai.maticvigil.com/"
+      );
       const contract = new ethers.Contract(
         contract_address,
         contract_abi,
@@ -29,16 +33,16 @@ const BuyingPage: React.FC = () => {
       const data = await contract.allListings();
       console.log(data);
       setData(data);
-    }
-    catch(e){
+    } catch (e) {
       alert(e);
     }
-  }
+
+    setIsLoading(false);
+  };
 
   useEffect(() => {
     getData();
   }, []);
-
 
   return (
     <section className="h-screen bg-[#1e1e1e] bg-[url('/bg2.png')] bg-center overflow-hidden">
@@ -54,20 +58,24 @@ const BuyingPage: React.FC = () => {
             <p>Buy</p>
           </div>
 
+          {isLoading && <Loader />}
+
           <div className="">
-            {data && data.map((item, index) => (
-              item.amount > 0 &&
-              <BuyingItem
-                key={index}
-                name={item.tokenName}
-                price={item.price}
-                quantity={item.amount}
-                seller= {item.seller}
-                id={index}
-                matic={item.matic}
-              />
-              
-            ))}
+            {data &&
+              data.map(
+                (item, index) =>
+                  item.amount > 0 && (
+                    <BuyingItem
+                      key={index}
+                      name={item.tokenName}
+                      price={item.price}
+                      quantity={item.amount}
+                      seller={item.seller}
+                      id={index}
+                      matic={item.matic}
+                    />
+                  )
+              )}
           </div>
         </div>
       </div>
