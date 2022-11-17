@@ -1,9 +1,52 @@
-export const contract_address = "0x3B83E422762F394c024aA0a073850A46A31330fC";
+export const contract_address = "0x91bc266aa852340cBCEF51DDb2D63C523d96F8A0";
 export const contract_abi = [
   {
     "inputs": [],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "seller",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "buyerName",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "tokenName",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "price",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "orderId",
+        "type": "uint256"
+      }
+    ],
+    "name": "request",
+    "type": "event"
   },
   {
     "inputs": [],
@@ -162,6 +205,11 @@ export const contract_abi = [
         "internalType": "string",
         "name": "buyerName",
         "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "tokenName",
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -273,6 +321,11 @@ export const contract_abi = [
           {
             "internalType": "string",
             "name": "buyerName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "tokenName",
             "type": "string"
           }
         ],
@@ -411,6 +464,11 @@ export const contract_abi = [
       {
         "internalType": "string",
         "name": "buyerName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "tokenName",
         "type": "string"
       }
     ],
@@ -796,6 +854,11 @@ export const contract_abi = [
       {
         "internalType": "string",
         "name": "buyerName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "tokenName",
         "type": "string"
       }
     ],

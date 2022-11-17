@@ -9,7 +9,8 @@ const BuyingItem: React.FC<{
   price: number;
   seller: string;
   id: number;
-}> = ({ name, quantity, price,seller,id }) => {
+  matic : boolean;
+}> = ({ name, quantity, price,seller,id ,matic}) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const { contract,signer ,account}: any = useContext(dexContext);
 
@@ -27,8 +28,14 @@ const BuyingItem: React.FC<{
 
   const buyItem = async (id:number,amount:BigNumber,name:string) => {
     try {
-      const tx = await contract.buyMaticRequest(id,amount,name);
-      await tx.wait();
+      if(matic){
+        const tx = await contract.buyMaticRequest(id,amount,name);
+        await tx.wait();
+      }
+      else{
+        const tx = await contract.buyTokenRequest(id,amount,name);
+        await tx.wait();
+      }
       alert("Item bought successfully!");
     } catch (e) {
       alert(e);

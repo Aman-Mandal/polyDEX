@@ -1,15 +1,16 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useContext } from "react";
 import { dexContext } from "../../components/Layout/Layout";
 import { ethers, Signer } from "ethers";
-import { erc20abi, contract_address } from "../../constants/index";
+import { erc20abi, contract_address,contract_abi } from "../../constants/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 const SellingFrom: React.FC = () => {
   const { contract, connect, connected, signer }: any = useContext(dexContext);
 
   const [isChecked, setIsChecked] = useState<boolean>(false);
-
+  const [price,setPrice] = useState<string>();
   const tokenAddressInputRef = useRef<HTMLInputElement>(null);
   const tokenNameInputRef = useRef<HTMLInputElement>(null);
   const priceInputRef = useRef<HTMLInputElement>(null);
@@ -61,6 +62,27 @@ const SellingFrom: React.FC = () => {
       alert(error);
     }
   };
+
+  const getPrice = async () => {
+    try{
+      const provider = new ethers.providers.JsonRpcProvider("https://rpc-mumbai.maticvigil.com/");
+      const contract = new ethers.Contract(
+        contract_address,
+        contract_abi,
+        provider
+      );
+      const data = await contract.getLatestPrice();
+
+      setPrice(ethers.utils.formatUnits(data,8));
+    }
+    catch(e){
+      alert(e);
+
+    }
+  }
+  useEffect(() => {
+    getPrice();
+  }, []);
 
   const labelStyle: string =
     "font-semibold text-sm mb-1 text-gray-300  w-full flex items-center ";

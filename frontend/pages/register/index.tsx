@@ -255,7 +255,7 @@ const RegistrationFrom: React.FC = () => {
                     ref={gpayInputRef}
                     className={`border border-gray-400 p-2 w-[18rem] rounded-lg`}
                     type="text"
-                    placeholder="abcd@oksbi.com"
+                    placeholder="abcd@oksbi"
                     value={gpayUPI}
                     onChange={gpayUPIChangeHandler}
                   />

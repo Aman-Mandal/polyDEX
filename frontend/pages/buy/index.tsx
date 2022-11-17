@@ -4,13 +4,6 @@ import { useContext,useState } from "react";
 import { dexContext } from "../../components/Layout/Layout";
 import { ethers } from "ethers";
 import { contract_address, contract_abi } from "../../constants/index";
-const DUMMY_DATA = [
-  { name: "USDT", quantity: 2, price: 134 },
-  { name: "BTT", quantity: 12, price: 674 },
-  { name: "ETH", quantity: 76, price: 1934 },
-  { name: "BTC", quantity: 20, price: 214 },
-  { name: "USDT", quantity: 2, price: 136 },
-];
 
 interface Data {
   tokenName: string;
@@ -18,6 +11,7 @@ interface Data {
   amount: number;
   price: number;
   seller: string;
+  matic: boolean;
 }
 
 const BuyingPage: React.FC = () => {
@@ -62,6 +56,7 @@ const BuyingPage: React.FC = () => {
 
           <div className="">
             {data && data.map((item, index) => (
+              item.amount > 0 &&
               <BuyingItem
                 key={index}
                 name={item.tokenName}
@@ -69,7 +64,9 @@ const BuyingPage: React.FC = () => {
                 quantity={item.amount}
                 seller= {item.seller}
                 id={index}
+                matic={item.matic}
               />
+              
             ))}
           </div>
         </div>

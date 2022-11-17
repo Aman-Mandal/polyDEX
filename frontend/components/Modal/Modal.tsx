@@ -22,6 +22,7 @@ const Modal: React.FC<{
   tokenQuantity: string;
   seller:string;
   id:number;
+
   buyItem: (id: number, amount: BigNumber, name: string) => void;
 }> = ({ tokenName, tokenPrice, tokenQuantity, onClose ,buyItem,seller,id}) => {
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -96,7 +97,7 @@ const Modal: React.FC<{
             <input
               required
               ref={nameInputRef}
-              className="p-3 rounded-lg"
+              className="p-3 rounded-lg text-gray-700"
               type="text"
               placeholder="John Doe"
             />
@@ -109,7 +110,7 @@ const Modal: React.FC<{
             <input
               required
               ref={quantitynputRef}
-              className="p-3 rounded-lg"
+              className="p-3 rounded-lg text-gray-700"
               type="number"
               placeholder="0"
               onChange={handleTokenQuantity}
@@ -121,10 +122,10 @@ const Modal: React.FC<{
               Price
             </label>
             <input
-              className="p-3 rounded-lg"
+              className="p-3 rounded-lg text-gray-700"
               type="text"
               placeholder="0"
-              value={price}
+              value={price + " $"}
               readOnly
             />
           </div>

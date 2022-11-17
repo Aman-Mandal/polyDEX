@@ -32,6 +32,7 @@ contract  polyDEX {
         uint256 price;
         uint256 orderId;
         string buyerName;
+        string tokenName;
     }
 
     struct SellerList {
@@ -107,7 +108,7 @@ contract  polyDEX {
         require(listings[id].amount >= amount, "Not enough tokens");
         address payable seller = listings[id].seller;
         require(seller != address(0), "Seller not found");
-        buyRequests[seller].push(buyRequest(payable(msg.sender),seller,address(0),true,false,true,false,false,amount,listings[id].price,orderId,_name));
+        buyRequests[seller].push(buyRequest(payable(msg.sender),seller,address(0),true,false,true,false,false,amount,listings[id].price,orderId,_name,"MATIC"));
         orders[orderId] = buyRequests[seller][buyRequests[seller].length-1];
         userRequests[msg.sender].push(buyRequests[listings[id].seller][buyRequests[listings[id].seller].length - 1]);
         sellerList[listings[id].seller].amount -= amount;
@@ -121,7 +122,7 @@ contract  polyDEX {
         require(listings[id].amount >= amount, "Not enough tokens");
         SellerList memory listing = tokenSellerList[listings[id].seller][listings[id].tokenAddress];
         require(listing.seller != address(0), "Seller not found");
-        buyRequests[listing.seller].push(buyRequest(payable(msg.sender),listings[id].seller,listings[id].tokenAddress,false,false,true,false,false,amount,listing.price,orderId,_name));
+        buyRequests[listing.seller].push(buyRequest(payable(msg.sender),listings[id].seller,listings[id].tokenAddress,false,false,true,false,false,amount,listing.price,orderId,_name,listings[id].tokenName));
         orders[orderId] = buyRequests[listing.seller][buyRequests[listing.seller].length - 1];
         userRequests[msg.sender].push(buyRequests[listing.seller][buyRequests[listing.seller].length - 1]);
         tokenSellerList[listings[id].seller][listings[id].tokenAddress].amount -= amount;
@@ -138,12 +139,14 @@ contract  polyDEX {
             orders[id].buyer.transfer(orders[id].amount);
             sellerList[orders[id].seller].locked -= orders[id].amount;
             listings[sellerList[orders[id].seller].listId] = sellerList[orders[id].seller];
+            buyRequests[orders[id].seller][sellerList[orders[id].seller].listId].fulfilled = true;
         }
         else{
             IERC20 token = IERC20(orders[id].tokenAddress);
             require(token.transfer(orders[id].buyer, orders[id].amount), "Token transfer failed");
             tokenSellerList[orders[id].seller][orders[id].tokenAddress].locked -= orders[id].amount;
             listings[tokenSellerList[orders[id].seller][orders[id].tokenAddress].listId] = tokenSellerList[orders[id].seller][orders[id].tokenAddress];
+            buyRequests[orders[id].seller][tokenSellerList[orders[id].seller][orders[id].tokenAddress].listId].fulfilled = true;
         }
         orders[id].fulfilled = true;
     }

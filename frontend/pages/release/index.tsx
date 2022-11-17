@@ -4,10 +4,6 @@ import { useContext,useState,useEffect } from "react";
 import { dexContext } from "../../components/Layout/Layout";
 import { ethers } from "ethers";
 import { contract_address, contract_abi } from "../../constants/index";
-const DUMMY_DATA = [
-  { buyerName: "Aman", tokenName: "BTT", amount: 2000, price: 0.0000068 },
-  { buyerName: "Aman", tokenName: "BTT", amount: 1200, price: 0.0000068 }
-];
 
 interface Data {
   buyerName: string;
@@ -18,24 +14,37 @@ interface Data {
 
 const ReleasePage = () => {
   const { contract,signer ,account}: any = useContext(dexContext);
-  const [data, setData] = useState<Data[]>([]);
+  const [data, setData] = useState<any[]>([]);
 
 
   const getData = async () => {
     try{
       const data = await contract.getRequests(account);
+      
+      setData(Object.entries(data));
       console.log(data);
-      console.log(Object.entries(data));
-      setData(data);
     }
     catch(e){
       alert(e);
     }
   }
 
+  const releaseItem = async (id:number) => {
+    try {
+      const tx = await contract.release(id);
+      await tx.wait();
+      alert("Item released successfully!");
+    } catch (e) {
+      alert(e);
+    }
+  };
+
+
   useEffect(() => {
-    getData();
-  }, []);
+    if (contract) {
+      getData();
+    }
+  }, [account]);
   return (
     <section className="h-screen bg-[#1e1e1e] bg-[url('/bg2.png')] bg-center overflow-hidden">
       <div className="w-[90%] mx-auto py-28">
@@ -52,15 +61,21 @@ const ReleasePage = () => {
           </div>
 
           <div className="">
-            {DUMMY_DATA.map((item, index) => (
+            {account ? data.map((item, index) => (
+              !item[1].fulfilled &&
               <ReleaseItem
                 key={index}
-                sellerName={item.buyerName}
-                tokenName={item.tokenName}
-                price={item.price}
-                quantity={item.amount}
+                sellerName={item[1].buyerName}
+                tokenName={item[1].tokenName}
+                price={item[1].price}
+                quantity={item[1].amount}
+                id={item[1].orderId}
+                releaseItem = {releaseItem}
               />
-            ))}
+
+            ))
+            : <div className="text-center text-white font-Grotesk text-2xl mt-4">Please connect your wallet</div>
+          }
           </div>
         </div>
       </div>
