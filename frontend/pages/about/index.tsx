@@ -8,7 +8,7 @@ const data = [
 
     title: "Create an account",
     subtitle: "Generate a secure wallet in seconds.",
-    text: "Or sign up with web3. BitTorrent Dex supports all the ethereum wallets like Metamask and Ledger.",
+    text: "Or sign up with web3. polyDex supports all the ethereum wallets like Metamask and Ledger.",
   },
   {
     id: 2,
