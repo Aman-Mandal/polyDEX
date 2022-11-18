@@ -4,8 +4,6 @@ A Peer to peer decentralised crypto marketplace where user can sell and buy poly
 
 [Demo link](https://poly-dex.vercel.app/)
 
-[Demo link2](https://polydex-a4f3bc.spheron.app/)
-
 [Demo Video](https://www.youtube.com/watch?v=fdZ_QQeziB0)
 
 ### Technologies Used :
