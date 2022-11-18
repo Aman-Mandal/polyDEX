@@ -220,8 +220,8 @@ const SellingFrom: React.FC = () => {
           {showWarning && (
             <p className="text-red-500 font-medium mt-2">
               Warning: Your price of token should range between{" "}
-              {(Number(price) - 0.2).toFixed(2)} to{" "}
-              {(Number(price) + 0.2).toFixed(2)}
+              {(Number(price) - 0.1).toFixed(2)} to{" "}
+              {(Number(price) + 0.1).toFixed(2)}
             </p>
           )}
           {connected ? (
