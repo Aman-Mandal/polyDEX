@@ -1,9 +1,10 @@
 import React from "react";
 import ReleaseItem from "../../components/ReleaseItem/ReleaseItem";
-import { useContext,useState,useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { dexContext } from "../../components/Layout/Layout";
 import { ethers } from "ethers";
 import { contract_address, contract_abi } from "../../constants/index";
+import Loader from "../../components/Loader/Loader";
 
 interface Data {
   buyerName: string;
@@ -13,23 +14,25 @@ interface Data {
 }
 
 const ReleasePage = () => {
-  const { contract,signer ,account}: any = useContext(dexContext);
+  const { contract, signer, account }: any = useContext(dexContext);
   const [data, setData] = useState<any[]>([]);
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const getData = async () => {
-    try{
+    try {
+      setIsLoading(true);
       const data = await contract.getRequests(account);
-      
+
       setData(Object.entries(data));
       console.log(data);
-    }
-    catch(e){
+    } catch (e) {
       alert(e);
     }
-  }
 
-  const releaseItem = async (id:number) => {
+    setIsLoading(false);
+  };
+
+  const releaseItem = async (id: number) => {
     try {
       const tx = await contract.release(id);
       await tx.wait();
@@ -38,7 +41,6 @@ const ReleasePage = () => {
       alert(e);
     }
   };
-
 
   useEffect(() => {
     if (contract) {
@@ -53,29 +55,35 @@ const ReleasePage = () => {
         </h2>
         <div className="w-[80%] h-full mx-auto border border-gray-400 rounded-xl p-2 ">
           <div className="flex justify-around py-5 font-Grotesk text-lg text-gray-400 bg-blur bg-[#313131]/10 uppercase tracking-wider">
-            
             <h2>Token</h2>
             <h2>Quantity</h2>
             <p>Price</p>
             <p>Release</p>
           </div>
 
-          <div className="">
-            {account ? data.map((item, index) => (
-              !item[1].fulfilled &&
-              <ReleaseItem
-                key={index}
-                sellerName={item[1].buyerName}
-                tokenName={item[1].tokenName}
-                price={item[1].price}
-                quantity={item[1].amount}
-                id={item[1].orderId}
-                releaseItem = {releaseItem}
-              />
+          {isLoading && <Loader />}
 
-            ))
-            : <div className="text-center text-white font-Grotesk text-2xl mt-4">Please connect your wallet</div>
-          }
+          <div className="">
+            {account ? (
+              data.map(
+                (item, index) =>
+                  !item[1].fulfilled && (
+                    <ReleaseItem
+                      key={index}
+                      sellerName={item[1].buyerName}
+                      tokenName={item[1].tokenName}
+                      price={item[1].price}
+                      quantity={item[1].amount}
+                      id={item[1].orderId}
+                      releaseItem={releaseItem}
+                    />
+                  )
+              )
+            ) : (
+              <div className="text-center text-white font-Grotesk text-2xl mt-4">
+                Please connect your wallet
+              </div>
+            )}
           </div>
         </div>
       </div>

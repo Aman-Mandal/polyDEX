@@ -2,6 +2,7 @@ import Image from "next/image";
 import React, { useRef, useState,useEffect } from "react";
 import { BigNumber, ethers } from "ethers";
 import { contract_address, contract_abi } from "../../constants/index";
+
 const Backdrop: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   return (
     <div
@@ -75,7 +76,7 @@ const Modal: React.FC<{
   return (
     <>
       <Backdrop onClose={onClose} />
-      <section className="rounded-2xl bg-gray-200/30 backdrop-blur-xl p-8 w-[30rem] fixed left-[50%] top-[55%] -translate-x-[50%] -translate-y-[50%]  mx-auto">
+      <section className="rounded-2xl bg-gray-200/30 backdrop-blur-xl p-8 w-[30rem] max-h-[33rem] overflow-scroll fixed left-[50%] top-[55%] -translate-x-[50%] -translate-y-[50%]  mx-auto">
         <div className="bg-[#1e1e1e] rounded-lg py-3 px-5">
           <h2 className="text-gray-400 font-semibold mb-2">
             Token Name:{" "}
@@ -122,8 +123,9 @@ const Modal: React.FC<{
               Price
             </label>
             <input
-              className="p-3 rounded-lg text-gray-700"
+              className="p-3 rounded-lg text-gray-700 bg-gray-300 cursor-not-allowed"
               type="text"
+              disabled
               placeholder="0"
               value={price + " $"}
               readOnly
