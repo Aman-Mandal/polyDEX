@@ -5,6 +5,7 @@ import { ethers, Signer } from "ethers";
 import { erc20abi, contract_address,contract_abi } from "../../constants/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {Web3Storage} from "web3.storage";
 
 const SellingFrom: React.FC = () => {
   const { contract, connect, connected, signer }: any = useContext(dexContext);
@@ -15,11 +16,31 @@ const SellingFrom: React.FC = () => {
   const tokenNameInputRef = useRef<HTMLInputElement>(null);
   const priceInputRef = useRef<HTMLInputElement>(null);
   const amountInputRef = useRef<HTMLInputElement>(null);
+  const [dataUrl,setDataUrl] = useState<string>("");
 
   const checkboxHandler = () => {
     setIsChecked(!isChecked);
   };
+  function makeFileObjects (data :any) {
+    const obj = data;
+    const blob = new Blob([JSON.stringify(obj)], { type: 'application/json' })
+  
+    const files = [
+      new File([blob], 'data.json')
+    ]
+    return files
+  }
 
+  //uploadig data to IPFS
+  const storeContent = async (data : any) => {
+    const web3storage_key = process.env.NEXT_PUBLIC_WEB3_STORAGE_KEY;
+    const client = new Web3Storage({ token: web3storage_key || ""});
+    const files = makeFileObjects(data);
+    const cid = await client.put([files[0]]);
+    const url = ("ipfs://"+cid+"/data.json");
+    setDataUrl(url);
+    return cid;
+  };
   const registerHandler = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -34,6 +55,10 @@ const SellingFrom: React.FC = () => {
       return alert("Enter Token Address and Token Name or use Matic Token");
 
     try {
+      let data : any = [];
+      data.push({name: enteredTokenName, amount: enteredAmount, price: enteredPrice, seller: signer._address});
+      const cid = await storeContent(data);
+      console.log(cid);
       if (isChecked) {
         const price = ethers.utils.parseEther(enteredPrice);
         const amount = ethers.utils.parseEther(enteredAmount);

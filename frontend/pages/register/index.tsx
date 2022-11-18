@@ -9,6 +9,7 @@ import { useContext } from "react";
 import { dexContext } from "../../components/Layout/Layout";
 import { ethers } from "ethers";
 import { ToastContainer, toast } from "react-toastify";
+import {Web3Storage} from "web3.storage";
 import "react-toastify/dist/ReactToastify.css";
 
 const RegistrationFrom: React.FC = () => {
@@ -18,6 +19,7 @@ const RegistrationFrom: React.FC = () => {
   const [gpayUPI, setGpayUPI] = useState<string>("");
   const [phonepeUPI, setPhonepeUPI] = useState<string>("");
   const [paypalEmail, setPaypalEmail] = useState<string>("");
+  const [dataUrl,setDataUrl] = useState<string>("");
 
   const [showPaytmUPI, setShowPaytmUPI] = useState<boolean>(false);
   const [showGpayUPI, setShowGpayUPI] = useState<boolean>(false);
@@ -30,6 +32,27 @@ const RegistrationFrom: React.FC = () => {
   const phonepeInputRef = useRef<HTMLInputElement>(null);
   const paytmInputRef = useRef<HTMLInputElement>(null);
   const paypalInputRef = useRef<HTMLInputElement>(null);
+
+  function makeFileObjects (data :any) {
+    const obj = data;
+    const blob = new Blob([JSON.stringify(obj)], { type: 'application/json' })
+  
+    const files = [
+      new File([blob], 'data.json')
+    ]
+    return files
+  }
+
+  //uploadig data to IPFS
+  const storeContent = async (data : any) => {
+    const web3storage_key = process.env.NEXT_PUBLIC_WEB3_STORAGE_KEY;
+    const client = new Web3Storage({ token: web3storage_key || ""});
+    const files = makeFileObjects(data);
+    const cid = await client.put([files[0]]);
+    const url = ("ipfs://"+cid+"/data.json");
+    setDataUrl(url);
+    return cid;
+  };
 
   const paytmUPIHandler: () => void = () => {
     setShowPaytmUPI(!showPaytmUPI);
@@ -122,6 +145,12 @@ const RegistrationFrom: React.FC = () => {
       });
     }
     try {
+      let data : any =[]
+      data.payments = payments;
+      data.name = enteredName;
+      data.email = enteredEmail;
+      const cid = await storeContent(data);
+      console.log(cid);
       const tx = await contract.register(enteredName, enteredEmail, payments);
       await tx.wait();
       toast.success("Registered Successfully");
