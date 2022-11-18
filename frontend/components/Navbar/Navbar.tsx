@@ -12,7 +12,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className=" text-white bg-[#1e1e1e] py-4 top-0 z-[20] fixed  w-full mt-48">
+    <nav className=" text-white bg-[#1e1e1e] py-4 top-0 z-[20] fixed  w-full">
       <div className="flex justify-between w-[90%] mx-auto items-center">
         <h2
           onClick={homepageHandler}
