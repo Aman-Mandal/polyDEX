@@ -2,42 +2,46 @@ import React, { useEffect, useRef, useState } from "react";
 import { useContext } from "react";
 import { dexContext } from "../../components/Layout/Layout";
 import { ethers, Signer } from "ethers";
-import { erc20abi, contract_address,contract_abi } from "../../constants/index";
+import {
+  erc20abi,
+  contract_address,
+  contract_abi,
+} from "../../constants/index";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {Web3Storage} from "web3.storage";
+import { Web3Storage } from "web3.storage";
 
 const SellingFrom: React.FC = () => {
   const { contract, connect, connected, signer }: any = useContext(dexContext);
 
   const [isChecked, setIsChecked] = useState<boolean>(false);
-  const [price,setPrice] = useState<string>();
+  const [price, setPrice] = useState<string>();
   const tokenAddressInputRef = useRef<HTMLInputElement>(null);
   const tokenNameInputRef = useRef<HTMLInputElement>(null);
   const priceInputRef = useRef<HTMLInputElement>(null);
   const amountInputRef = useRef<HTMLInputElement>(null);
-  const [dataUrl,setDataUrl] = useState<string>("");
+  const [dataUrl, setDataUrl] = useState<string>("");
+  const [showWarning, setShowWarning] = useState<boolean>(false);
+  const [enteredPriceState, setEnteredPriceState] = useState<string>("");
 
   const checkboxHandler = () => {
     setIsChecked(!isChecked);
   };
-  function makeFileObjects (data :any) {
+  function makeFileObjects(data: any) {
     const obj = data;
-    const blob = new Blob([JSON.stringify(obj)], { type: 'application/json' })
-  
-    const files = [
-      new File([blob], 'data.json')
-    ]
-    return files
+    const blob = new Blob([JSON.stringify(obj)], { type: "application/json" });
+
+    const files = [new File([blob], "data.json")];
+    return files;
   }
 
   //uploadig data to IPFS
-  const storeContent = async (data : any) => {
+  const storeContent = async (data: any) => {
     const web3storage_key = process.env.NEXT_PUBLIC_WEB3_STORAGE_KEY;
-    const client = new Web3Storage({ token: web3storage_key || ""});
+    const client = new Web3Storage({ token: web3storage_key || "" });
     const files = makeFileObjects(data);
     const cid = await client.put([files[0]]);
-    const url = ("ipfs://"+cid+"/data.json");
+    const url = "ipfs://" + cid + "/data.json";
     setDataUrl(url);
     return cid;
   };
@@ -55,8 +59,13 @@ const SellingFrom: React.FC = () => {
       return alert("Enter Token Address and Token Name or use Matic Token");
 
     try {
-      let data : any = [];
-      data.push({name: enteredTokenName, amount: enteredAmount, price: enteredPrice, seller: signer._address});
+      let data: any = [];
+      data.push({
+        name: enteredTokenName,
+        amount: enteredAmount,
+        price: enteredPrice,
+        seller: signer._address,
+      });
       const cid = await storeContent(data);
       console.log(cid);
       if (isChecked) {
@@ -89,8 +98,10 @@ const SellingFrom: React.FC = () => {
   };
 
   const getPrice = async () => {
-    try{
-      const provider = new ethers.providers.JsonRpcProvider("https://rpc-mumbai.maticvigil.com/");
+    try {
+      const provider = new ethers.providers.JsonRpcProvider(
+        "https://rpc-mumbai.maticvigil.com/"
+      );
       const contract = new ethers.Contract(
         contract_address,
         contract_abi,
@@ -98,16 +109,29 @@ const SellingFrom: React.FC = () => {
       );
       const data = await contract.getLatestPrice();
 
-      setPrice(ethers.utils.formatUnits(data,8));
-    }
-    catch(e){
+      setPrice(ethers.utils.formatUnits(data, 8));
+    } catch (e) {
       alert(e);
-
     }
-  }
+  };
+
   useEffect(() => {
     getPrice();
   }, []);
+
+  const priceChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEnteredPriceState(event.currentTarget.value);
+    if (isChecked && price != null) {
+      if (
+        Number(event.currentTarget.value) < Number(price) - 0.2 ||
+        Number(event.currentTarget.value) > Number(price) + 0.2
+      ) {
+        setShowWarning(true);
+      } else {
+        setShowWarning(false);
+      }
+    }
+  };
 
   const labelStyle: string =
     "font-semibold text-sm mb-1 text-gray-300  w-full flex items-center ";
@@ -115,8 +139,8 @@ const SellingFrom: React.FC = () => {
     "border border-gray-400 p-2 w-full rounded-lg mb-3";
 
   return (
-    <div className="w-full  flex flex-col bg-[#1e1e1e]  items-center h-screen bg-[url('/bg2.png')] bg-center  justify-center   gap-10">
-      <div className="flex-[0.67] p-8 rounded-xl mt-24 border border-gray-500 shadow-[4.0px_8.0px_8.0px_rgba(0,0,0,0.38)]">
+    <div className="w-full  flex flex-col bg-[#1e1e1e]   items-center h-screen bg-[url('/bg2.png')] bg-center  justify-center   gap-10">
+      <div className="flex-[0.67]  p-8 rounded-xl mt-24 border border-gray-500 shadow-[4.0px_8.0px_8.0px_rgba(0,0,0,0.38)]">
         <p className="text-4xl font-Grotesk font-semibold mb-8 bg-gradient-to-r text-transparent bg-clip-text from-[#FD42FB] via-[#CD9ECD] to-[#753FF3]">
           Sell any Polygon Chain Token
         </p>
@@ -174,8 +198,11 @@ const SellingFrom: React.FC = () => {
                 id="price"
                 type="text"
                 placeholder="0.12"
+                onChange={priceChangeHandler}
+                value={enteredPriceState}
               />
             </div>
+
             <div className="flex flex-col ">
               <label htmlFor="amount" className={labelStyle}>
                 Amount
@@ -190,6 +217,13 @@ const SellingFrom: React.FC = () => {
               />
             </div>
           </div>
+          {showWarning && (
+            <p className="text-red-500 font-medium mt-2">
+              Warning: Your price of token should range between{" "}
+              {(Number(price) - 0.2).toFixed(2)} to{" "}
+              {(Number(price) + 0.2).toFixed(2)}
+            </p>
+          )}
           {connected ? (
             <button
               className="mt-10  bg-gray-600 text-white text-lg px-20 uppercase py-2 rounded-md font-Grotesk font-medium hover:scale-105 hover:bg-gray-300 hover:text-black"
@@ -199,7 +233,7 @@ const SellingFrom: React.FC = () => {
             </button>
           ) : (
             <button
-              className="mt-10 bg-gradient-to-r  uppercase from-[#FD42FB] via-[#CD9ECD] to-[#753FF3] text-gray-100 text-lg px-4 py-2 rounded-md font-Grotesk font-medium hover:scale-105 hover:bg-gray-300 hover:text-black"
+              className="mt-10  bg-gray-600 text-white text-lg px-20 uppercase py-2 rounded-md font-Grotesk font-medium hover:scale-105 hover:bg-gray-300 hover:text-black"
               type="button"
               onClick={connect}
             >
